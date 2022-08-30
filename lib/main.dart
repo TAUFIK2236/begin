@@ -96,7 +96,7 @@ class HomePage extends StatelessWidget {
 
                 return const Text("Done");
               default:
-                return const Text('loading');
+                return const Text('loading you have to wait');
             }
           },
         ));
