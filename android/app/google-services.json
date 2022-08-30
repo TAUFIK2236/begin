@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "769025686694",
+    "project_id": "little-neck",
+    "storage_bucket": "little-neck.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769025686694:android:41cd6be0db0d7df96f8867",
+        "android_client_info": {
+          "package_name": "com.example.untitled"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "769025686694-9g1090p0cvfp4vn9u611qfh6fmtd8tn8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-E1qe-U-jvyceHXTrLqjTUjbScwt3rrA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "769025686694-9g1090p0cvfp4vn9u611qfh6fmtd8tn8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
