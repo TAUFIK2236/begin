@@ -8,7 +8,8 @@ import 'package:untitled/services/auth/auth_service.dart';
 import 'package:untitled/services/auth/auth_user.dart';
 import 'dart:developer' as devtools show log;
 
-import '../utilities/show_erorr_dialog.dart';
+import '../utilities/dialogs/error_dialog.dart';
+
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);

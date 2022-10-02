@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/services/Crud/notes_service.dart';
 import 'package:untitled/services/auth/auth_service.dart';
+import 'package:untitled/view/notes/notes_list_view.dart';
 import '../../Constants/routes.dart';
 import '../../enums/menu_action.dart';
+import '../../utilities/dialogs/logout_dialog.dart';
 
 //import 'package:firebase_auth/firebase_auth.dart';
 class NotesView extends StatefulWidget {
@@ -24,20 +26,17 @@ class _NotesViewState extends State<NotesView> {
   }
 
   @override
-  void dispose() {
-    _notesService.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    print("$userEmail+ this is User Email" );
     return Scaffold(
       appBar: AppBar(
         title: const Text("Main UI"),
         actions: [
-          IconButton(onPressed:(){
-            Navigator.of(context).pushNamed(newNoteRoute);
-          }, icon:const Icon(Icons.add)),
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(createOrUpdateNoteRoute);
+              },
+              icon: const Icon(Icons.add)),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
@@ -64,7 +63,7 @@ class _NotesViewState extends State<NotesView> {
         ],
       ),
       body: FutureBuilder(
-          future: _notesService.getOrCreateUser(userEmail),
+          future: _notesService.getOrCreateUser( email:userEmail,),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
@@ -74,7 +73,25 @@ class _NotesViewState extends State<NotesView> {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                       case ConnectionState.active:
-                        return const Text("Waiting for all notes");
+                        if (snapshot.hasData) {
+                          final allNotes = snapshot.data as List<DatabaseNote>;
+                          return NotesListView(
+                            notes: allNotes,
+                            onDeleteNote: (note) async {
+                              await _notesService.deleteNote(note.id);
+                            },
+                            onTap: (note) async {
+                              Navigator.of(context).pushNamed(
+                                createOrUpdateNoteRoute,
+                                arguments: note,
+                              );
+                            },
+                          );
+                          // print(allNotes);
+
+                        } else {
+                          return CircularProgressIndicator();
+                        }
                       default:
                         return CircularProgressIndicator();
                     }
@@ -87,27 +104,4 @@ class _NotesViewState extends State<NotesView> {
           }),
     );
   }
-}
-
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Sign out"),
-          content: Text("Arew you sure to log out?"),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-                child: Text("Cancel")),
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-                child: Text("Log out")),
-          ],
-        );
-      }).then((value) => value ?? false);
 }

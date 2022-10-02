@@ -9,7 +9,7 @@ import 'package:untitled/Constants/routes.dart';
 import 'package:untitled/services/auth/auth_service.dart';
 import 'package:untitled/view/Register.dart';
 import 'package:untitled/view/login_view.dart';
-import 'package:untitled/view/notes/new__note_view.dart';
+import 'package:untitled/view/notes/create_update_note_view.dart';
 import 'package:untitled/view/notes/notes_view.dart';
 import 'package:untitled/view/verify_email.dart';
 import 'firebase_options.dart';
@@ -29,7 +29,7 @@ void main() {
       registerRoutes: (context) => const RegisterView(),
       notesRoutes  :(context) => const NotesView(),
       verifyEmailRoutes:(context) => const VerifyEmailView(),
-      newNoteRoute:(context) => const NewNoteView(),
+      createOrUpdateNoteRoute:(context) => const CreateUpdateNoteView(),
     },
   ));
 }

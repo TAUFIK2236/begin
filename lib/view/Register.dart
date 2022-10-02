@@ -7,7 +7,8 @@ import 'package:untitled/services/auth/auth_service.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
 
-import '../utilities/show_erorr_dialog.dart';
+import '../utilities/dialogs/error_dialog.dart';
+
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
