@@ -1,4 +1,4 @@
-import 'dart:async';
+ import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:untitled/extensions/list/filter.dart';
 import 'package:untitled/services/Crud/crud_exceptions.dart';
 
-class NotesService {
+ /*class NotesService {
   Database? _db;
 
   List<DatabaseNote> _notes = [];
@@ -349,4 +349,4 @@ const createNoteTable = '''
 	  "is_synced_with_cloud"	INTEGER NOT NULL DEFAULT 0,
 	  PRIMARY KEY("id" AUTOINCREMENT),
   	FOREIGN KEY("user_id") REFERENCES "user"("id")
-   );''';
+    );'''; */

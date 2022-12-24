@@ -1,9 +1,11 @@
-
-
 import "package:flutter/material.dart";
 import 'package:untitled/services/Crud/notes_service.dart';
 import 'package:untitled/services/auth/auth_service.dart';
+import 'package:untitled/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:untitled/utilities/generics/get_arguments.dart';
+import 'package:untitled/services/cloud/cloud_note.dart';
+import 'package:untitled/services/cloud/cloud_storage_exceptions.dart';
+import 'package:untitled/services/cloud/firebase_cloud_storage.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
   const CreateUpdateNoteView({Key? key}) : super(key: key);
@@ -13,39 +15,40 @@ class CreateUpdateNoteView extends StatefulWidget {
 }
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
-  DatabaseNote? _note;
-  late final NotesService _notesService;
+  CloudNote? _note;
+  late final FirebaseCloudStorage _notesService;
   late final TextEditingController _textController;
 
   @override
   void initState() {
-    _notesService = NotesService();
+    _notesService = FirebaseCloudStorage();
     _textController = TextEditingController();
     super.initState();
   }
 
-  void _textControllerlistener() async{
+  void _textControllerlistener() async {
     final note = _note;
-    if(note == null){
+    if (note == null) {
       return;
     }
     final text = _textController.text;
-    await _notesService.updateNote(note, text);
+    await _notesService.updateNote(
+      documentId: note.documentId,
+      text: text,
+    );
   }
-  
-  void _setupTextControllerListener(){
+
+  void _setupTextControllerListener() {
     _textController.removeListener(_textControllerlistener);
     _textController.addListener(_textControllerlistener);
   }
-  
 
-  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
-
-    final widgetNote = context.getArgument<DatabaseNote>();
-    if (widgetNote != null){
+  Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArgument<CloudNote>();
+    if (widgetNote != null) {
       _note = widgetNote;
-       _textController.text = widgetNote.text;
-       return widgetNote;
+      _textController.text = widgetNote.text;
+      return widgetNote;
     }
 
     final existingNote = _note;
@@ -53,9 +56,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       return existingNote;
     }
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email!;
-    final owner = await _notesService.getUser(email: email);
-    final newNote = await _notesService.createNote(owner:owner);
+    final email = currentUser.email;
+    final userId = currentUser.id;
+    final newNote = await _notesService.createNewNote(ownerUserId: userId);
     _note = newNote;
     return newNote;
   }
@@ -63,7 +66,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   void _deleteNoteIfTextIsEmpty() {
     final note = _note;
     if (_textController.text.isEmpty && note != null) {
-      _notesService.deleteNote(note.id);
+      _notesService.deleteNote(
+        documentId: note.documentId,
+      );
     }
   }
 
@@ -72,49 +77,55 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final text = _textController.text;
     if (note != null && text.isNotEmpty) {
       await _notesService.updateNote(
-        note,
-        text,
+        documentId: note.documentId,
+        text: text,
       );
     }
   }
 
-  void dispose (){
+  void dispose() {
     _deleteNoteIfTextIsEmpty();
     _saveNoteifTextNotEmpty();
     _textController.dispose();
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("new note"),
+        actions: [
+          IconButton(
+            onPressed: () async{
+              final text = _textController.text;
+              if(_note ==null || text.isEmpty){
+               await showCannotShareEmptyNoteDialog(context);
+              }
+            },
+            icon: Icon(Icons.share),
+          )
+        ],
       ),
       body: FutureBuilder(
-        future: createOrGetExistingNote(context) ,
-        builder:(context,snapshot){
-
-          switch(snapshot.connectionState){
-
+        future: createOrGetExistingNote(context),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
             case ConnectionState.done:
-             // _note = snapshot.data as DatabaseNote;
+              // _note = snapshot.data as DatabaseNote;
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: const InputDecoration(
-                  hintText: 'Start typing your note...'
-                ),
+                    hintText: 'Start typing your note...'),
               );
-            default: return CircularProgressIndicator();
-
+            default:
+              return CircularProgressIndicator();
           }
         },
       ),
     );
   }
 }
-
